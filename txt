@@ -1,6 +1,3 @@
-//Rextester.Program.Main is the entry point for your code. Don't change it.
-//Compiler version 4.0.30319.17929 for Microsoft (R) .NET Framework 4.5
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +11,17 @@ namespace Rextester
         static List<Node> Lista;
         
         public static void Main(string[] args) {        
-            Lista = GerarLista(18);          
-                       
-            ConfiguraNo(SelecionaNo(1),new int[] {2,8,12,13}, null);
-            ConfiguraNo(SelecionaNo(2),new int[] {1,2,12,13}, null);
+                     
+			#region Cria primeiro no
+			Node primeiro = new Node();
+			primeiro.primeiro = true;
+			primeiro.visitado = false;
+			primeiro.vizinhos = new List<Node>();									
+            ConfiguraNo(primeiro, new int[]{2,8,12,13}, new int[]{20,29,29,37});
+			#endregion
+				
+			Node segundo = primeiro.vizinhos.Where(x=> x.numero == 2).FirstOrDefault();
+            ConfiguraNo(segundo,  new int[]{1,3,12,13}, new int[]{20,25,28,39});
                                                 
             Console.WriteLine(Lista[0].vizinhos.Count());
             
@@ -32,39 +36,29 @@ namespace Rextester
         }
                                   
         
-        public static void ConfiguraNo(Node no, int[] valores, int? peso) {            
-            for(int i = 0; i < valores.Length; i++) {                
-                no.vizinhos.Add(Lista.ElementAt(valores[i]-1));
-                if(!no.primeiro) {
-                   no.peso = peso;
-                }
-            }
+        public static void ConfiguraNo(Node no, int[] vizinhos, int[] custos) {			
+			if (no.vizinhos.Count() == 0) {
+				//Cria os vizinhos;
+            	for(int i = 1; i < vizinhos.Length; i++) {	
+					Node noexiste = Lista.Where(x=> x.numero == i).Select(x => x).FirstOrDefault();
+					
+					Node vizinho = new Node();
+					vizinho.visitado = false;
+					vizinho.numero = vizinhos[i-1];				
+                	vizinho.peso = custos[i-1];
+					
+					no.vizinhos.Add(vizinho);
+            	}
+				Lista.Add(no);
+			}
         }
-
-                    
-        public static List<Node> GerarLista(int num) {
-           List<Node> Lista = new List<Node>();
-        
-            for(int i = 1; i <= num; i++) {
-                Node no = new Node();
-                if (i == 1) { //COLOCA O PRIMEIRO NÓ                   
-                    no.primeiro = true;
-                }
-                no.visitado = false;
-                no.vizinhos = new List<Node>();
-                Lista.Add(no);                          
-                //Console.WriteLine(no.primeiro.ToString());                                           
-            }
-            return Lista;
-        }
-        
+		
     public class Node {
         public bool primeiro;
+		public int numero;
         public bool visitado;
         public List<Node> vizinhos;
-        public int custo;
         public int? peso;    
     }
 }
 }
-
